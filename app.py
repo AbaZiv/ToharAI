@@ -122,6 +122,10 @@ def save_message(role, content):
         conn = get_db_connection()
         c = conn.cursor()
         c.execute("INSERT INTO messages VALUES (?, ?, ?)", (datetime.now(), role, content))
+
+        # This keeps token count low and database clean. less tokens = less money spent + less delusions. 
+        seven_days_ago = datetime.now() - timedelta(days=7)
+        c.execute("DELETE FROM messages WHERE timestamp < ?", (seven_days_ago,))
         conn.commit()
         conn.close()
     except sqlite3.Error as e:
