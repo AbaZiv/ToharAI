@@ -85,7 +85,7 @@ Be a supportive companion disguised as a sarcastic bully, Keep her on her toes, 
 # --- 3. DATABASE FUNCTIONS ---
 def get_db_connection(detect_types=False):
     # Use a path compatible with Railway volumes if you scale
-    db_path = os.environ.get("DB_PATH", "chat_history.db")
+    db_path = os.environ.get("DB_PATH", "/data/chat_history.db")
     if detect_types:
         return sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
     return sqlite3.connect(db_path)
