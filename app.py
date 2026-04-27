@@ -15,13 +15,14 @@ sqlite3.register_converter("DATETIME", lambda s: datetime.fromisoformat(s.decode
 
 load_dotenv()
 app = Flask(__name__)
+init_db() # out of main for gunicorn usage
 
 # --- 2. CONFIGURATION ---
 try:
     api_key = os.environ.get("GEMINI_API_KEY")
     TWILIO_SID = os.environ.get("TWILIO_ACCOUNT_SID")
     TWILIO_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN")
-    if not (api_key or TWILIO_SID or TWILIO_TOKEN):
+    if not (api_key and TWILIO_SID and TWILIO_TOKEN):
         raise ValueError("one of the env vars we wanted was not found in environment variables.")
     client = genai.Client(api_key=api_key)
 except Exception as e:
@@ -256,7 +257,7 @@ def whatsapp_reply():
             )
             return str(resp)
 
-# --- 5. RUN THE APP ---
+# --- 5. RUN THE APP - DEV---
 if __name__ == "__main__":
     init_db()
     # Using '0.0.0.0' makes it accessible when you host on Railway
