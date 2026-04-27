@@ -15,7 +15,6 @@ sqlite3.register_converter("DATETIME", lambda s: datetime.fromisoformat(s.decode
 
 load_dotenv()
 app = Flask(__name__)
-init_db() # out of main for gunicorn usage
 
 # --- 2. CONFIGURATION ---
 try:
@@ -104,6 +103,7 @@ def init_db():
     
     conn.commit()
     conn.close()
+init_db() # out of main for gunicorn usage
 
 def get_recent_context():
     try:
