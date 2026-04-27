@@ -131,6 +131,17 @@ def save_message(role, content):
     except sqlite3.Error as e:
         print(f"Database Write Error: {e}")
 
+def wipe_chat_history():
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute("DELETE FROM messages")
+        conn.commit()
+        conn.close()
+        return True
+    except sqlite3.Error as e:
+        print(f"Wipe Error: {e}")
+        return False
 
 # webhook yay
 @app.route("/whatsapp", methods=['POST'])
@@ -143,14 +154,25 @@ def whatsapp_reply():
     if not incoming_msg and not media_url:
         return "", 200
 
+    clean_msg = incoming_msg.lower().strip()
+
     # --- LOGIC: CHECK IF SHE WANTS THE ERROR DUMP ---
-    if incoming_msg.lower() == "בננה":
+    if clean_msg == "אני סושייי":
+        print("SUSHI")
         conn = get_db_connection()
         res = conn.execute("SELECT value FROM system_status WHERE key='last_error'").fetchone()
         conn.close()
         if res:
             resp = MessagingResponse()
             resp.message(f"🛠️ הנה החרבון המלא:\n\n{res[0]}")
+            return str(resp)
+    
+     # --- LOGIC: REFRESH CONTEXT ---
+    if clean_msg == "בננה":
+        print("BANANA")
+        if wipe_chat_history():
+            resp = MessagingResponse()
+            resp.message("מה זה? מי אני? מה אני? איפה אני? מחקת לי את הזכרון!! סתם בייבי, הכל טוב, אני חדש עכשיו 🧚‍♀️")
             return str(resp)
 
     # Prepare parts for Gemini (can include text, images, or both)
@@ -230,7 +252,7 @@ def whatsapp_reply():
             resp = MessagingResponse()
             resp.message(
                 '''היי לירון, זה זיו, חבר שלך, אם את רואה את זה - סימן שהבוט שלי התחרבן. כנראה שהשרתים שהוא מדבר איתם עמוסים. תנסי שוב עוד כמה שניות בייבי?
-אם את עדיין הכי רוצה בעולם לראות מה השגיאה המלאה, תכתבי "בננה".'''
+אם את עדיין הכי רוצה בעולם לראות מה השגיאה המלאה, תכתבי "אני סושייי".'''
             )
             return str(resp)
 
