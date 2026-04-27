@@ -145,7 +145,7 @@ def wipe_chat_history():
         return False
 
 # webhook yay
-@app.route("/whatsapp", methods=['POST'])
+@app.route("/TbhXuahhh12112025", methods=['POST'])
 def whatsapp_reply():
     incoming_msg = request.values.get('Body', '').strip()
     # Check if Twilio sent any media
